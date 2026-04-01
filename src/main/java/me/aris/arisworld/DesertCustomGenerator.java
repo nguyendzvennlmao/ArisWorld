@@ -18,10 +18,9 @@ public class DesertCustomGenerator extends ChunkGenerator {
             for (int z = 0; z < 16; z++) {
                 chunkData.setBlock(x, 0, z, Material.BEDROCK);
                 
-                double frequency = 0.05;
-                double noise = Math.sin(x * frequency) * Math.cos(z * frequency);
-                int heightVariation = random.nextInt(4) + 1; 
-                int height = 60 + (int) (noise * heightVariation);
+                double freq = 0.05;
+                double noise = Math.sin(x * freq) * Math.cos(z * freq);
+                int height = 60 + (int) (noise * (random.nextInt(4) + 1));
                 
                 for (int y = 1; y < height - 3; y++) {
                     if (y < 40 && random.nextInt(100) < 15) {
@@ -36,17 +35,17 @@ public class DesertCustomGenerator extends ChunkGenerator {
                 }
 
                 if (random.nextInt(100) < 4) {
-                    Material mat = random.nextBoolean() ? Material.DIRT : Material.MOSS_BLOCK;
-                    chunkData.setBlock(x, height, z, mat);
+                    Material m = random.nextBoolean() ? Material.DIRT : Material.MOSS_BLOCK;
+                    chunkData.setBlock(x, height, z, m);
                 }
 
                 if (random.nextInt(1000) < 3) {
-                    int depth = random.nextInt(4) + 1;
-                    for (int ly = height; ly > height - depth; ly--) {
+                    int d = random.nextInt(4) + 1;
+                    for (int ly = height; ly > height - d; ly--) {
                         chunkData.setBlock(x, ly, z, Material.WATER);
                     }
                 }
             }
         }
     }
-                        }
+                                                  }
