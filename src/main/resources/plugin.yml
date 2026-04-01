@@ -1,0 +1,10 @@
+name: ArisWorld
+version: 1.0
+author: VennLMAO
+main: me.aris.arisworld.ArisWorld
+api-version: 1.20
+folia-supported: true
+commands:
+  world:
+    description: Quan ly the gioi
+    usage: /world <create|delete|import|tp> [ten] [loai]
