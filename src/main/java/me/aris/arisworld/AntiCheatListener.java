@@ -17,23 +17,23 @@ public class AntiCheatListener implements Listener {
 
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        World world = player.getWorld();
+        Player p = event.getPlayer();
+        World w = p.getWorld();
         
-        List<String> enabledWorlds = plugin.getConfig().getStringList("anti-freecam.enabled-worlds");
-        if (enabledWorlds == null || !enabledWorlds.contains(world.getName())) return;
+        List<String> worlds = plugin.getConfig().getStringList("anti-freecam.enabled-worlds");
+        if (worlds == null || !worlds.contains(w.getName())) return;
 
-        int hideY = plugin.getConfig().getInt("anti-freecam.hide-below-y");
+        int limitY = plugin.getConfig().getInt("anti-freecam.hide-below-y");
         
-        if (player.getEyeLocation().getY() < hideY) {
-            if (player.getGameMode() != org.bukkit.GameMode.SPECTATOR) return;
-            for (Player target : Bukkit.getOnlinePlayers()) {
-                player.hidePlayer(plugin, target);
+        if (p.getEyeLocation().getY() < limitY) {
+            if (p.getGameMode() != org.bukkit.GameMode.SPECTATOR) return;
+            for (Player t : Bukkit.getOnlinePlayers()) {
+                p.hidePlayer(plugin, t);
             }
         } else {
-            for (Player target : Bukkit.getOnlinePlayers()) {
-                player.showPlayer(plugin, target);
+            for (Player t : Bukkit.getOnlinePlayers()) {
+                p.showPlayer(plugin, t);
             }
         }
     }
-                }
+}
