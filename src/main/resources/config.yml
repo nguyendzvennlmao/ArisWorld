@@ -1,0 +1,14 @@
+anti-xray:
+  enabled-worlds:
+    - "world"
+    - "SaMac"
+  fake-ores:
+    - DIAMOND_ORE
+    - GOLD_ORE
+    - IRON_ORE
+    - EMERALD_ORE
+    - DEEPSLATE_DIAMOND_ORE
+anti-freecam:
+  hide-below-y: -1
+  enabled-worlds:
+    - "SaMac"
