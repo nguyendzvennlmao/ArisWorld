@@ -18,67 +18,85 @@ public class ArisWorld extends JavaPlugin implements CommandExecutor, TabComplet
         getCommand("world").setExecutor(this);
         getCommand("world").setTabCompleter(this);
         getServer().getPluginManager().registerEvents(new AntiCheatListener(this), this);
-        loadExistingWorlds();
+        
+        Bukkit.getGlobalRegionScheduler().run(this, task -> {
+            loadExistingWorlds();
+        });
     }
 
     private void loadExistingWorlds() {
         File container = getServer().getWorldContainer();
         File[] files = container.listFiles();
         if (files == null) return;
-        for (File file : files) {
-            if (file.isDirectory() && new File(file, "level.dat").exists()) {
-                String name = file.getName();
-                if (Bukkit.getWorld(name) == null) {
-                    new WorldCreator(name).createWorld();
+        for (File f : files) {
+            if (f.isDirectory() && new File(f, "level.dat").exists()) {
+                String n = f.getName();
+                if (Bukkit.getWorld(n) == null) {
+                    new WorldCreator(n).createWorld();
                 }
             }
         }
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player player)) return true;
+    public boolean onCommand(CommandSender s, Command c, String l, String[] args) {
+        if (!(s instanceof Player p)) return true;
         if (args.length < 2) return false;
 
         String action = args[0].toLowerCase();
-        String worldName = args[1];
+        String name = args[1];
 
         switch (action) {
             case "create" -> {
                 String type = args.length > 2 ? args[2].toLowerCase() : "normal";
-                WorldCreator creator = new WorldCreator(worldName);
-                if (type.equals("samac")) creator.generator(new DesertCustomGenerator());
-                else if (type.equals("void")) creator.generator(new ChunkGenerator() {});
-                else if (type.equals("flat")) creator.type(WorldType.FLAT);
-                else if (type.equals("nether")) creator.environment(World.Environment.NETHER);
-                else if (type.equals("end")) creator.environment(World.Environment.THE_END);
-                Bukkit.createWorld(creator);
-                player.sendMessage("§aCreated " + worldName);
+                WorldCreator cr = new WorldCreator(name);
+                if (type.equals("samac")) cr.generator(new DesertCustomGenerator());
+                else if (type.equals("void")) cr.generator(new ChunkGenerator() {});
+                else if (type.equals("flat")) cr.type(WorldType.FLAT);
+                else if (type.equals("nether")) cr.environment(World.Environment.NETHER);
+                else if (type.equals("end")) cr.environment(World.Environment.THE_END);
+                
+                Bukkit.getGlobalRegionScheduler().run(this, task -> {
+                    Bukkit.createWorld(cr);
+                    p.sendMessage("§aCreated " + name);
+                });
             }
             case "tp" -> {
-                World w = Bukkit.getWorld(worldName);
-                if (w != null) player.teleportAsync(w.getSpawnLocation());
+                World w = Bukkit.getWorld(name);
+                if (w != null) p.teleportAsync(w.getSpawnLocation());
             }
             case "import" -> {
-                if (new File(getServer().getWorldContainer(), worldName).exists()) {
-                    Bukkit.createWorld(new WorldCreator(worldName));
-                    player.sendMessage("§aImported!");
+                if (new File(getServer().getWorldContainer(), name).exists()) {
+                    Bukkit.getGlobalRegionScheduler().run(this, task -> {
+                        Bukkit.createWorld(new WorldCreator(name));
+                        p.sendMessage("§aImported!");
+                    });
                 }
             }
             case "delete" -> {
-                World w = Bukkit.getWorld(worldName);
-                if (w != null) Bukkit.unloadWorld(w, false);
+                World w = Bukkit.getWorld(name);
+                if (w != null) {
+                    Bukkit.getGlobalRegionScheduler().run(this, task -> {
+                        Bukkit.unloadWorld(w, false);
+                        p.sendMessage("§cUnloaded!");
+                    });
+                }
             }
         }
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {
+    public List<String> onTabComplete(CommandSender s, Command c, String a, String[] args) {
         if (args.length == 1) return Arrays.asList("create", "delete", "import", "tp");
+        if (args.length == 2) {
+            List<String> worlds = new ArrayList<>();
+            Bukkit.getWorlds().forEach(w -> worlds.add(w.getName()));
+            return worlds;
+        }
         if (args.length == 3 && args[0].equalsIgnoreCase("create")) {
             return Arrays.asList("samac", "void", "normal", "nether", "end", "flat");
         }
         return null;
     }
-                    }
+                   }
